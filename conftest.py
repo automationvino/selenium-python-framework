@@ -10,14 +10,26 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 @pytest.fixture(scope="function")
 def setup():
-    driver = webdriver.Chrome()
+
+    browser = ReadConfig.get_browser().lower()
+
+    if browser == "chrome":
+        driver = webdriver.Chrome()
+
+    elif browser == "firefox":
+        driver = webdriver.Firefox()
+
+    else:
+        raise Exception(f"Browser '{browser}' is not supported")
+
     driver.maximize_window()
-    #driver.get("https://xwctest.services.xerox.com/")
+
     baseURL = ReadConfig.get_base_url()
     driver.get(baseURL)
-    yield driver
-    driver.quit()
 
+    yield driver
+
+    driver.quit()
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
 
